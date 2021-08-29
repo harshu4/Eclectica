@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CirclePay Gateway Ecletica</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+  <link rel="stylesheet" href="src/css/style.css">
+  <link rel="stylesheet" href="src/css/checkbox.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="./src/js/qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/openpgp/4.4.10/openpgp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
+</head>
+<body>
+    <div  style=" position: absolute; left: 0; right: 0;">
+      <div class="wrapper" id="app">
+        <div id="buy_form" class="card-form" style="display: none;">
+            <div class="card-form__inner" style="padding-top: 20px">
+                <div class="card-input" >
+                    <label for="ubalance" class="card-input__label">Your Balance (USDC)</label>
+                    <div style="display: flex;align-items: center;" id="ubalance" class="card-input__input"></div>
+                </div>
+                <div class="card-input" >
+                    <label for="uamount" class="card-input__label">Amount (USDC)</label>
+                    <div style="display: flex;align-items: center;" id="uamount" class="card-input__input"></div>
+                </div>
+                <div class="card-input" >
+                    <label for="upaddress" class="card-input__label">Paying To</label>
+                    <div style="display: flex;align-items: center;" id="upaddress" class="card-input__input"></div>
+                </div>
+                <div class="card-input" >
+                    <label for="uitem" class="card-input__label">You Buying</label>
+                    <div style="display: flex;align-items: center;" id="uitem" class="card-input__input"></div>
+                </div>
+                <button  id="pay_now" class="card-form__button ripple">
+                    Pay
+                </button>
+            </div>
+        </div>
+        <div id="payo_form" class="card-form" style="display: none;">
+            <div class="card-form__inner" style="padding-top: 20px">
+                <div class="card-input" >
+                    <label for="ubalancepo" class="card-input__label">Your Balance (USDC)</label>
+                    <div style="display: flex;align-items: center;" id="ubalancepo" class="card-input__input"></div>
+                </div>
+                <div class="card-input">
+                    <label for="uamountpo" class="card-input__label">Amount (USDC)</label>
+                    <input type="text" id="uamountpo" class="card-input__input" data-ref="uamountpo" autocomplete="off">
+                </div>
+                <button  id="withdraw_now" class="card-form__button ripple">
+                    Withdraw
+                </button>
+            </div>
+        </div>
+        <div id="payd" class="card-form" style="display: none;">
+           
+            <div class="card-form__inner" style="padding-top: 20px">
+               <span>&#9989; Payment sent. Amount will be reflected in your account once it get settled. Now you can close this window.</span>
+            </div>
+        </div>
+        <div id="buy_sucess" class="card-form" style="display: none;">
+            <div class="card-form__inner" style="padding-top: 20px">
+               <span>&#9989; NFT bougth sucessfully. Soon it will be reflected on your eth address.</span>
+            </div>
+        </div>
+        <div id="payo_sucess" class="card-form" style="display: none;">
+            <div class="card-form__inner" style="padding-top: 20px">
+               <span>&#9989; Payout initiated. You will receive it in short time.</span>
+            </div>
+        </div>
+        <div id="loader" class="card-form" style="display: none;">
+           
+            <div class="card-form__inner" style="padding-top: 20px">
+                <div style="display: flex;align-items: center;justify-content: center;">
+                    <div class="reverse-spinner"></div>
+                </div>
+            </div>
+        </div>
+       <!-- <div id="logreg" class="card-form" style="display: none;">
+           
+            <div class="card-form__inner" style="padding-top: 20px">
+                <div style="display: flex;">
+                    <input class="checkbox-budget" type="radio" name="budget1" id="login" value="login"  checked>
+                    <label class="for-checkbox-budget" for="login">
+                        <span data-hover="Login">Login</span>
+                    </label>
+                    <input class="checkbox-budget" type="radio" name="budget1" value="register" id="register">
+                    <label class="for-checkbox-budget" for="register">
+                        <span data-hover="Register">Register</span>
+                    </label>
+                </div>
+                <div id="logininp" style="margin-top: 20px;">
+                    <div class="card-input">
+                        <label for="logintk" class="card-input__label">Login Token</label>
+                        <input type="text" id="logintk" class="card-input__input" data-ref="logintk" autocomplete="off">
+                    </div>
+                    <span id="loginm" style="display: none;">
+                        Use above token to login. Keep it secure its not recoverable.
+                    </span>
+                </div>
+                <div id="reginp" style="margin-top: 20px; display: none;">  
+                    <div class="card-input">
+                        <label for="regpa" class="card-input__label">Polygon Address</label>
+                        <input type="text" id="regpa" class="card-input__input" data-ref="regpa" autocomplete="off">
+                    </div>
+                </div>
+                <button  id="logreg_next" class="card-form__button ripple">
+                    Submit
+                </button>
+            </div>
+        </div>    -->  
+    <div id="pay_menu" class="card-form" style="display: none;">
+        <div class="card-form__inner" style="padding-top: 20px">
+            <div style="display: flex;">
+                <input class="checkbox-budget" type="radio" name="budget" id="card" value="card"  checked>
+                <label class="for-checkbox-budget" for="card">
+                    <span data-hover="Card">Card</span>
+                </label>
+                <input class="checkbox-budget" type="radio" name="budget" value="crypto" id="crypto">
+                <label class="for-checkbox-budget" for="crypto">
+                    <span data-hover="Crypto">Crypto</span>
+                </label>
+            </div>
+            <div id="card_a"   style="margin-top:20px;">
+                <div class="card-input" >
+                    <label for="ubalancef" class="card-input__label">Your Balance (USDC)</label>
+                    <div style="display: flex;align-items: center;" id="ubalancef" class="card-input__input"></div>
+                </div>
+                <div class="card-input">
+                    <label for="amountusd" class="card-input__label">Amount ($)</label>
+                    <input type="text" onkeypress='validate(event)' id="amountusd" class="card-input__input" data-ref="amountusd" autocomplete="off">
+                </div>
+            </div>
+            <div id="crypto_a"  style="margin-top:20px;display: none;">
+                <div class="card-input" >
+                    <label for="ubalancef1" class="card-input__label">Your Balance (USDC)</label>
+                    <div style="display: flex;align-items: center;" id="ubalancef1" class="card-input__input"></div>
+                </div>
+                <div class="card-input">
+                    <select class="card-input__input -select" id="Currency" data-ref="Currency">
+                        <option value="" disabled selected>Currency</option>
+                        <option value="USD">USD</option>
+                        <!--<option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="CUSDC">CUSDC</option>-->
+                    </select>
+                </div>
+                <!--<div class="card-input">
+                    <label for="amountc" class="card-input__label">Amount</label>
+                    <input type="text" onkeypress='validate(event)' id="amountc" class="card-input__input" data-ref="amountc" autocomplete="off">
+                </div>-->
+            </div>
+            <button id="paym_next" class="card-form__button ripple">
+                Next
+            </button>
+        </div>
+    </div>
+    <div id="card_details" class="card-form" style="display: none;">
+    <div class="card-list">
+        <div class="card-item" v-bind:class="{ '-active' : isCardFlipped }">
+        <div class="card-item__side -front">
+            <div class="card-item__focus" v-bind:class="{'-active' : focusElementStyle }" v-bind:style="focusElementStyle" ref="focusElement"></div>
+            <div class="card-item__cover">
+            <img
+            v-bind:src="'https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/' + currentCardBackground + '.jpeg'" class="card-item__bg">
+            </div>
+            
+            <div class="card-item__wrapper">
+            <div class="card-item__top">
+                <img src="https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/chip.png" class="card-item__chip">
+                <div class="card-item__type">
+                <transition name="slide-fade-up">
+                    <img v-bind:src="'https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/' + getCardType + '.png'" v-if="getCardType" v-bind:key="getCardType" alt="" class="card-item__typeImg">
+                </transition>
+                </div>
+            </div>
+            <label for="cardNumber" class="card-item__number" ref="cardNumber">
+                <template v-if="getCardType === 'amex'">
+                <span v-for="(n, $index) in amexCardMask" :key="$index">
+                <transition name="slide-fade-up">
+                    <div
+                    class="card-item__numberItem"
+                    v-if="$index > 4 && $index < 14 && cardNumber.length > $index && n.trim() !== ''"
+                    >*</div>
+                    <div class="card-item__numberItem"
+                    :class="{ '-active' : n.trim() === '' }"
+                    :key="$index" v-else-if="cardNumber.length > $index">
+                    {{cardNumber[$index]}}
+                    </div>
+                    <div
+                    class="card-item__numberItem"
+                    :class="{ '-active' : n.trim() === '' }"
+                    v-else
+                    :key="$index + 1"
+                    >{{n}}</div>
+                </transition>
+                </span>
+                </template>
+
+                <template v-else>
+                <span v-for="(n, $index) in otherCardMask" :key="$index">
+                    <transition name="slide-fade-up">
+                    <div
+                        class="card-item__numberItem"
+                        v-if="$index > 4 && $index < 15 && cardNumber.length > $index && n.trim() !== ''"
+                    >*</div>
+                    <div class="card-item__numberItem"
+                        :class="{ '-active' : n.trim() === '' }"
+                        :key="$index" v-else-if="cardNumber.length > $index">
+                        {{cardNumber[$index]}}
+                    </div>
+                    <div
+                        class="card-item__numberItem"
+                        :class="{ '-active' : n.trim() === '' }"
+                        v-else
+                        :key="$index + 1"
+                    >{{n}}</div>
+                    </transition>
+                </span>
+                </template>
+            </label>
+            <div class="card-item__content">
+                <label for="cardName" class="card-item__info" ref="cardName">
+                <div class="card-item__holder">Card Holder</div>
+                <transition name="slide-fade-up">
+                    <div class="card-item__name" v-if="cardName.length" key="1">
+                    <transition-group name="slide-fade-right">
+                        <span class="card-item__nameItem" v-for="(n, $index) in cardName.replace(/\s\s+/g, ' ')" v-if="$index === $index" v-bind:key="$index + 1">{{n}}</span>
+                    </transition-group>
+                    </div>
+                    <div class="card-item__name" v-else key="2">Full Name</div>
+                </transition>
+                </label>
+                <div class="card-item__date" ref="cardDate">
+                <label for="cardMonth" class="card-item__dateTitle">Expires</label>
+                <label for="cardMonth" class="card-item__dateItem">
+                    <transition name="slide-fade-up">
+                    <span v-if="cardMonth" v-bind:key="cardMonth">{{cardMonth}}</span>
+                    <span v-else key="2">MM</span>
+                    </transition>
+                </label>
+                /
+                <label for="cardYear" class="card-item__dateItem">
+                    <transition name="slide-fade-up">
+                    <span v-if="cardYear" v-bind:key="cardYear">{{String(cardYear).slice(2,4)}}</span>
+                    <span v-else key="2">YY</span>
+                    </transition>
+                </label>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="card-item__side -back">
+            <div class="card-item__cover">
+            <img
+            v-bind:src="'https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/' + currentCardBackground + '.jpeg'" class="card-item__bg">
+            </div>
+            <div class="card-item__band"></div>
+            <div class="card-item__cvv">
+                <div class="card-item__cvvTitle">CVV</div>
+                <div class="card-item__cvvBand">
+                <span v-for="(n, $index) in cardCvv" :key="$index">
+                    *
+                </span>
+
+            </div>
+                <div class="card-item__type">
+                    <img v-bind:src="'https://raw.githubusercontent.com/muhammederdem/credit-card-form/master/src/assets/images/' + getCardType + '.png'" v-if="getCardType" class="card-item__typeImg">
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="card-form__inner">
+        <div class="card-input">
+        <label for="cardNumber" class="card-input__label">Card Number</label>
+        <input type="text" id="cardNumber" class="card-input__input" v-mask="generateCardNumberMask" v-model="cardNumber" v-on:focus="focusInput" v-on:blur="blurInput" data-ref="cardNumber" autocomplete="off">
+        </div>
+        <div class="card-input">
+        <label for="cardName" class="card-input__label">Card Holder</label>
+        <input type="text" id="cardName" class="card-input__input" v-model="cardName" v-on:focus="focusInput" v-on:blur="blurInput" data-ref="cardName" autocomplete="off">
+        </div>
+        <div class="card-form__row">
+        <div class="card-form__col">
+            <div class="card-form__group">
+            <label for="cardMonth" class="card-input__label">Expiration Date</label>
+            <select class="card-input__input -select" id="cardMonth" v-model="cardMonth" v-on:focus="focusInput" v-on:blur="blurInput" data-ref="cardDate">
+                <option value="" disabled selected>Month</option>
+                <option v-bind:value="n < 10 ? '0' + n : n" v-for="n in 12" v-bind:disabled="n < minCardMonth" v-bind:key="n">
+                    {{n < 10 ? '0' + n : n}}
+                </option>
+            </select>
+            <select class="card-input__input -select" id="cardYear" v-model="cardYear" v-on:focus="focusInput" v-on:blur="blurInput" data-ref="cardDate">
+                <option value="" disabled selected>Year</option>
+                <option v-bind:value="$index + minCardYear" v-for="(n, $index) in 12" v-bind:key="n">
+                    {{$index + minCardYear}}
+                </option>
+            </select>
+            </div>
+        </div>
+        <div class="card-form__col -cvv">
+            <div class="card-input">
+            <label for="cardCvv" class="card-input__label">CVV</label>
+            <input type="text" class="card-input__input" id="cardCvv" v-mask="'####'" maxlength="4" v-model="cardCvv" v-on:focus="flipCard(true)" v-on:blur="flipCard(false)" autocomplete="off">
+            </div>
+        </div>
+        </div>
+
+        <button id="card_next" class="card-form__button ripple">
+            Next
+        </button>
+    </div>
+    </div>
+    <div id="billing_details" class="card-form" style="display: none;">
+        <div class="card-form__inner" style="padding-top: 20px">
+            <div class="card-input">
+                <label for="addline1" class="card-input__label">Address Line 1</label>
+                <input type="text" id="addline1" class="card-input__input" data-ref="addline1" autocomplete="off">
+            </div>
+            <div class="card-input">
+                <label for="addline2" class="card-input__label">Address Line 2</label>
+                <input type="text" id="addline2" class="card-input__input" data-ref="addline2" autocomplete="off">
+            </div>
+            <div class="card-input">
+                <label for="pcode" class="card-input__label">Postal Code</label>
+                <input type="text" onkeypress='validate(event)' id="pcode" class="card-input__input" data-ref="pcode" autocomplete="off">
+            </div>
+            <div class="card-input">
+                <label for="city" class="card-input__label">City</label>
+                <input type="text" id="city" class="card-input__input"  data-ref="city" autocomplete="off">
+            </div>
+            <div class="card-input">
+                <label for="country" class="card-input__label">Country Code</label>
+                <input type="text" id="country" class="card-input__input" data-ref="country" autocomplete="off">
+            </div>
+            <div class="card-input">
+                <label for="eid" class="card-input__label">Email Id</label>
+                <input type="text" id="eid" class="card-input__input" data-ref="eid" autocomplete="off">
+            </div>
+            <button  id="submit_card" class="card-form__button ripple">
+                Submit
+            </button>
+        </div>
+    </div>
+    <div id="crypto_payment" class="card-form" style="display: none;">
+        <div class="card-form__inner" style="padding-top: 20px">
+            <div>
+                <div style="display: flex;align-items: center;justify-content: center;" id="padd_qr">
+                </div>
+                <div class="card-input" style="margin-top: 20px;">
+                    <label for="scurrency" class="card-input__label">Currency</label>
+                    <input type="text"  id="scurrency" class="card-input__input" data-ref="scurrency" autocomplete="off" disabled>
+                </div>
+                <div class="card-input" >
+                    <label for="paddress" class="card-input__label">Payable address</label>
+                    <div style="display: flex;align-items: center;" id="paddress" class="card-input__input"></div>
+                </div>
+
+                You can close this window once payment complete. Your wallet will be automatically updated.
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- partial -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js'></script>
+    <script src='https://unpkg.com/vue-the-mask@0.11.1/dist/vue-the-mask.js'></script>
+    <script  src="/src/js/script.js"></script>
+    <script  src="/src/js/controller.js"></script>
+
+</body>
+</html>

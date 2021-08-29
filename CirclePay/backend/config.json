@@ -1,0 +1,5 @@
+{
+    "circle_jwt" : "circle jwt auth token",
+    "mongo_url" : "mongo url",
+    "circle_endpoint":"https://api-sandbox.circle.com/v1" 
+}
